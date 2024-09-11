@@ -3,6 +3,10 @@
 #include <chrono>
 #include <random>
 #include <algorithm>
+#include <string>
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 using namespace std::chrono;
 
@@ -46,19 +50,64 @@ vector<vector<int>> generarMatrizAleatoria(int N) {
 }
 
 int main() {
-    //ingresamos el valor N de la matriz N x N
-    int N;
-    cout << "Choose your N: ";
-    cin >> N;
-    //generamos e inicializamos las matrices A y B aleatorias
-    vector<vector<int>> matrizA = generarMatrizAleatoria(N);
-    vector<vector<int>> matrizB = generarMatrizAleatoria(N);
-    //comenzamos a tomar el tiempo de ejecucion del algoritmo
-    auto start = high_resolution_clock::now();
-    vector<vector<int>> matrizResult = MultiplicarMatrices(matrizA, matrizB, N);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    // imprimimos en pantalla la duracion en microsegundos del algortimo
-    cout<<"El algortimo ha demorado: "<<duration.count()<<" microsegundos"<<"\n";
+    // Ingresamos el valor N de la matriz N x N
+    int n, decision;
+    string nombre_archivo;
+    cout << "1. generar automaticamente 2. leer archivo de prueba: ";
+    cin >> decision;
+
+    if (decision == 1) {
+        int N;
+        cout << "Ingresa el tamaño del arreglo n x n: ";
+        cin >> N;
+        //generamos e inicializamos las matrices A y B aleatorias
+        vector<vector<int>> matrizA = generarMatrizAleatoria(N);
+        vector<vector<int>> matrizB = generarMatrizAleatoria(N);
+        //comenzamos a tomar el tiempo de ejecucion del algoritmo
+        auto start = high_resolution_clock::now();
+        vector<vector<int>> matrizResult = MultiplicarMatrices(matrizA, matrizB, N);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        // imprimimos en pantalla la duracion en microsegundos del algortimo
+        cout<<"El algortimo ha demorado: "<<duration.count()<<" microsegundos"<<"\n";
+    } else if (decision == 2) {
+        cout << "Introduce el nombre del archivo (archivo.txt): ";
+        cin >> nombre_archivo;
+        cout << "Ingresa el tamaño del arreglo n x n: ";
+        cin >> n;
+
+        ifstream archivo(nombre_archivo);  // Abre el archivo
+        vector<vector<int>> matriz;        // Declara una matriz (vector de vectores de enteros)
+
+        if (archivo.is_open()) {
+            string linea;
+            // Lee el archivo línea por línea
+            while (getline(archivo, linea)) {
+                vector<int> fila;          // Vector temporal para almacenar una fila
+                stringstream ss(linea);    // Stream para procesar la línea
+                int numero;
+                // Lee los números de la línea separados por espacios
+                while (ss >> numero) {
+                    fila.push_back(numero); // Agrega el número a la fila
+                }
+                matriz.push_back(fila);    // Agrega la fila completa a la matriz
+            }
+            archivo.close();  // Cierra el archivo
+            auto start = high_resolution_clock::now();
+            vector<vector<int>>resultado = MultiplicarMatrices(matriz, matriz, n);
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout<<"El algortimo ha demorado: "<<duration.count()<<" microsegundos"<<"\n";
+            // Imprime la matriz leída
+            for (const auto& fila : resultado) {
+                for (int numero : fila) {
+                    cout << numero << " ";  // Imprime los números de cada fila
+                }
+                cout << endl;  // Salto de línea al final de cada fila
+            }
+        } else {
+            cerr << "No se pudo abrir el archivo." << endl;
+        }
+    }
     return 0;
 }
