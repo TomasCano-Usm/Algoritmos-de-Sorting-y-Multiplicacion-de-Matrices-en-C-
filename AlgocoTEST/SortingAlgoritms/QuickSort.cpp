@@ -3,6 +3,9 @@
 #include <chrono>
 #include <random>
 #include <algorithm>
+#include <string>
+#include <fstream>
+
 using namespace std;
 using namespace std::chrono;
 
@@ -185,14 +188,44 @@ vector<int> CompleteTestCase(int n, int iteraciones) {
 
 int main() {
     //ingresamos el valor N de la matriz N x N
-    int n;
-    cout << "Choose your n: ";
-    cin >> n;
-    vector<int> VectorTest = CompleteTestCase(n, 10); // El segundo número es la cantidad de iteraciones del caso promedio
-    //imprimimimos por pantalla el resultado de los tiempos t (microsegundos) de la matriz de ancho y largo N
-    for (int j = 0; j < 3; j++) {
-        cout << VectorTest[j] << " ";
-    }
+    int n , decision;
+    string nombre_archivo;
+    cout <<"1. generar automaticamente 2. leer archivo de prueba: ";
+    cin >> decision;
+    if (decision == 1){
+        cout << "Ingresa el tamaño n: ";
+        cin >> n;
+        vector<int> VectorTest = CompleteTestCase(n, 10); // El segundo número es la cantidad de iteraciones del caso promedio
+        //imprimimimos por pantalla el resultado de los tiempos t (microsegundos) de la lista de largo N
+        for (int j = 0; j < 3; j++) {
+            cout << VectorTest[j] << " ";
+        }
     cout << "\n";
+    }else if(decision == 2){
+        cout <<"Introduce el nombre del archivo (archivo.txt): ";
+        cin >> nombre_archivo;
+        cout << "Ingresa el tamaño de la lista n: ";
+        cin >> n;
+        ifstream archivo(nombre_archivo);   // Abre el archivo usando el nombre proporcionado
+        vector<int> lista_numeros;          // Declara el vector para almacenar los números
+        int numero;
+        if (archivo.is_open()) {            // Verifica si el archivo se abrió correctamente
+            while (archivo >> numero) {     // Lee cada número del archivo
+            lista_numeros.push_back(numero);  // Lo agrega al vector
+            }
+            archivo.close();             // Cierra el archivo
+            auto start = high_resolution_clock::now();
+            quicksort(lista_numeros,0 ,n-1);
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout<<"tiempo del algortimo: "<<duration.count()<<"\n";
+        for (int n : lista_numeros) {
+            cout << n << endl;
+        }
+        } else {
+            cerr << "No se pudo abrir el archivo." << endl;
+            return 1;
+        }
+    }
     return 0;
 }
